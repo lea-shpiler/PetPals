@@ -1,27 +1,31 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { setUser } from '../../redux/userSlice';
+import { clearCart } from '../../redux/cartSlice';
+import { setMessage } from '../../redux/messageSlice';
 import './SignIn.scss';
-// ללל
+
 interface SignInProps {}
 
 const SignIn: FC<SignInProps> = () => {
-  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
-      name: '',
       email: '',
       password: '',
     },
     validationSchema: Yup.object({
-      name: Yup.string().required('שדה חובה'),
       email: Yup.string().email('אימייל לא תקין').required('שדה חובה'),
       password: Yup.string().min(6, 'לפחות 6 תווים').required('שדה חובה'),
     }),
     onSubmit: async (values) => {
       try {
-        const res = await fetch("http://localhost:3001/users");
+        const res = await fetch('http://localhost:3001/users');
         const users = await res.json();
 
         const userExists = users.find(
@@ -30,57 +34,52 @@ const SignIn: FC<SignInProps> = () => {
         );
 
         if (userExists) {
-          setMessage(`ברוכה הבאה, ${userExists.name}!`);
+          dispatch(setUser(userExists));
+          dispatch(clearCart()); // Clear cart for new user
+          dispatch(setMessage({ type: 'success', text: `ברוך הבא, ${userExists.name}!` }));
+          setTimeout(() => {
+            navigate('/home');
+          }, 1500);
         } else {
-          setMessage('אינך קיים נא להירשם.');
+          dispatch(setMessage({ type: 'error', text: 'אימייל או סיסמה שגויים' }));
         }
       } catch (error) {
-        setMessage('אירעה שגיאה בשרת, נסה שוב מאוחר יותר.');
+        dispatch(setMessage({ type: 'error', text: 'שגיאה בהתחברות, נסה שוב מאוחר יותר' }));
       }
     },
   });
 
   return (
-    <div className="SignIn">
-      <form onSubmit={formik.handleSubmit}>
-        <h2>רישום משתמש</h2>
+    <div className="Login" style={{ direction: 'rtl' }}>
+      <form onSubmit={formik.handleSubmit} style={{ width: '100%' }}>
+        <h3 className="text-center mb-4">התחברות</h3>
 
-        <div>
-          <label>שם:</label>
-          <input
-            name="name"
-            type="text"
-            onChange={formik.handleChange}
-            value={formik.values.name}
-          />
-          {formik.errors.name && <div className="error">{formik.errors.name}</div>}
-        </div>
-
-        <div>
-          <label>אימייל:</label>
+        <div className="mb-3">
+          <label className="form-label">אימייל:</label>
           <input
             name="email"
             type="email"
+            className="form-control"
             onChange={formik.handleChange}
             value={formik.values.email}
           />
-          {formik.errors.email && <div className="error">{formik.errors.email}</div>}
+          {formik.errors.email && <div className="text-danger small">{formik.errors.email}</div>}
         </div>
 
-        <div>
-          <label>סיסמה:</label>
+        <div className="mb-3">
+          <label className="form-label">סיסמה:</label>
           <input
             name="password"
             type="password"
+            className="form-control"
             onChange={formik.handleChange}
             value={formik.values.password}
           />
-          {formik.errors.password && <div className="error">{formik.errors.password}</div>}
+          {formik.errors.password && <div className="text-danger small">{formik.errors.password}</div>}
         </div>
 
-        <button type="submit">התחבר / הירשם</button>
+        <button type="submit" className="btn btn-primary w-100">התחבר</button>
       </form>
-      {message && <p className="message">{message}</p>}
     </div>
   );
 };

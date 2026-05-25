@@ -1,38 +1,40 @@
-.App {
-  text-align: center;
+/* Fixed toast-container at top-right, ensuring visibility when scrolling */
+.toast-container {
+  position: fixed !important; /* Enforce fixed positioning */
+  top: 20px;
+  right: 20px;
+  z-index: 9999; /* High z-index to stay above all content */
+  max-width: 300px; /* Compact width */
+  pointer-events: auto; /* Ensure interactivity */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Styling for success toast */
+.toast-success {
+  background-color: #d4edda;
+  color: #155724;
+  opacity: 0.95; /* Slightly transparent for better UX */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Styling for error toast */
+.toast-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  opacity: 0.95; /* Slightly transparent for better UX */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* Compact toast styling */
+.toast {
+  font-size: 0.9rem;
+  min-width: 200px;
+  border-radius: 8px; /* Rounded corners for better appearance */
 }
 
-.App-link {
-  color: #61dafb;
+/* Close button styling */
+.btn-close {
+  filter: invert(0.6); /* Improve visibility on light/dark backgrounds */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Ensure no parent elements interfere */
+body, html {
+  overflow: visible !important; /* Prevent overflow clipping */
 }
